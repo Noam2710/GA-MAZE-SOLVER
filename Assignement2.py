@@ -46,7 +46,7 @@ class Maze:
         for line in self.maze:
             line_to_print = ''
             for column in line:
-                line_to_print += self.get_element_by_column(column) + ' '
+                line_to_print += Maze.get_element_by_column(column) + ' '
             print(line_to_print)
 
     def get_element_by_column(column):
