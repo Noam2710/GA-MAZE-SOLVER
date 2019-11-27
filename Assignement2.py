@@ -5,7 +5,7 @@ SIZE_OF_CHROMOSOME = 20
 GENES_OPTIONES = ['RIGHT', 'LEFT', 'UP', 'DOWN']
 
 
-class Population():
+class Population:
     def __init__(self,size):
         self.list_of_individuals = []
         self.fittest_individual = None
@@ -16,7 +16,7 @@ class Population():
             self.list_of_individuals.append(new_individual)
 
 
-class Individual():
+class Individual:
     def __init__(self):
         self.genes = []
         for index in range(SIZE_OF_CHROMOSOME):
@@ -27,7 +27,7 @@ class Individual():
         pass
 
 
-class Maze():
+class Maze:
     def __init__(self):
         self.maze = [
         ['@', '@', '@', '@', '@', '@', '@'],
@@ -49,7 +49,7 @@ class Maze():
                 line_to_print += self.get_element_by_column(column) + ' '
             print(line_to_print)
 
-    def get_element_by_column(self, column):
+    def get_element_by_column(column):
         if column == '@':
             return colored(u"\u2588",'red')
         elif column == ' ':
