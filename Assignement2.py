@@ -9,6 +9,10 @@ SIZE_OF_CHROMOSOME = 20
 POP_SIZE = 100
 GENES_OPTIONS = ['RIGHT', 'LEFT', 'UP', 'DOWN']
 WALL = '@'
+GENOME_MIN = 0
+GENOME_MAX = 3
+GENERATIONS_NUMBER = 500
+PRINT_FINAL_SOLUTION = False
 
 
 class Maze:
@@ -123,9 +127,6 @@ def register_stats():
     stats.register("max", numpy.max)
 
 
-test_maze = Maze()
-
-
 def print_initial_maze():
     print('--------------------')
     test_maze.print_maze()
@@ -133,36 +134,37 @@ def print_initial_maze():
 
 
 def print_the_best_solution():
-    maze = Maze()
-    best_path = best_ind.items
-    print("Step No. 0")
-    maze.print_maze()
-    for idx, step in enumerate(best_path[0]):
-        step = GENES_OPTIONS[step]
-        if step == 'RIGHT':
-            new_index = [maze.current_loc[0], maze.current_loc[1] + 1]
-            valid_step = check_if_valid_step(new_index, maze.maze)
-        if step == 'LEFT':
-            new_index = [maze.current_loc[0], maze.current_loc[1] - 1]
-            valid_step = check_if_valid_step(new_index, maze.maze)
-        if step == 'UP':
-            new_index = [maze.current_loc[0] - 1, maze.current_loc[1]]
-            valid_step = check_if_valid_step(new_index, maze.maze)
-        if step == 'DOWN':
-            new_index = [maze.current_loc[0] + 1, maze.current_loc[1]]
-            valid_step = check_if_valid_step(new_index, maze.maze)
-
-        if valid_step:
-            maze.current_loc = new_index
-
-        print("Step No. {}".format(str(idx+1)))
+    if PRINT_FINAL_SOLUTION:
+        maze = Maze()
+        best_path = best_ind.items
+        print("Step No. 0")
         maze.print_maze()
+        for idx, step in enumerate(best_path[0]):
+            step = GENES_OPTIONS[step]
+            if step == 'RIGHT':
+                new_index = [maze.current_loc[0], maze.current_loc[1] + 1]
+                valid_step = check_if_valid_step(new_index, maze.maze)
+            if step == 'LEFT':
+                new_index = [maze.current_loc[0], maze.current_loc[1] - 1]
+                valid_step = check_if_valid_step(new_index, maze.maze)
+            if step == 'UP':
+                new_index = [maze.current_loc[0] - 1, maze.current_loc[1]]
+                valid_step = check_if_valid_step(new_index, maze.maze)
+            if step == 'DOWN':
+                new_index = [maze.current_loc[0] + 1, maze.current_loc[1]]
+                valid_step = check_if_valid_step(new_index, maze.maze)
 
-        if maze.current_loc == maze.end_loc:
-            break
+            if valid_step:
+                maze.current_loc = new_index
+
+            print("Step No. {}".format(str(idx+1)))
+            maze.print_maze()
+
+            if maze.current_loc == maze.end_loc:
+                break
 
 
-
+test_maze = Maze()
 print_initial_maze()
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
@@ -175,7 +177,7 @@ toolbox.register("individual", tools.initRepeat, creator.Individual,
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("evaluate", get_length_to_reach_the_goal)
 toolbox.register("mate", tools.cxOnePoint)
-toolbox.register("mutate", tools.mutUniformInt, low=0, up=3, indpb=0.5)
+toolbox.register("mutate", tools.mutUniformInt, low=GENOME_MIN, up=GENOME_MAX, indpb=0.5)
 toolbox.register("select", tools.selTournament, tournsize=10)
 
 
@@ -188,15 +190,8 @@ update_fitnesses_to_population()
 stats = tools.Statistics(key=lambda ind: ind.fitness.values)
 register_stats()
 
-pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=500, stats=stats, halloffame=best_ind,
+pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=GENERATIONS_NUMBER, stats=stats, halloffame=best_ind,
                                    verbose=True)
 
 print_the_best_solution()
 print_graph(logbook)
-
-
-
-
-
-
-
