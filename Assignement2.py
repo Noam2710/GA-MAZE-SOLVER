@@ -11,7 +11,7 @@ GENES_OPTIONS = ['RIGHT', 'LEFT', 'UP', 'DOWN']
 WALL = '@'
 GENOME_MIN = 0
 GENOME_MAX = 3
-GENERATIONS_NUMBER = 500
+GENERATIONS_NUMBER = 150
 PRINT_FINAL_SOLUTION = False
 
 
@@ -28,7 +28,6 @@ class Maze:
         self.start_loc = [1, 0]
         self.end_loc = [2, 6]
         self.current_loc = self.start_loc
-        self.best_way_length = 9
 
     def print_maze(self):
         temp = self.maze[self.current_loc[0]][self.current_loc[1]]
@@ -137,7 +136,7 @@ def print_the_best_solution():
     if PRINT_FINAL_SOLUTION:
         maze = Maze()
         best_path = best_ind.items
-        print("Step No. 0")
+        print("Initial Maze")
         maze.print_maze()
         for idx, step in enumerate(best_path[0]):
             step = GENES_OPTIONS[step]
