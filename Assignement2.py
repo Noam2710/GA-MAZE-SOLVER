@@ -149,6 +149,13 @@ def update_fitnesses_to_population():
         ind.fitness.values = fit
 
 
+def register_stats():
+    stats.register("avg", numpy.mean)
+    stats.register("std", numpy.std)
+    stats.register("min", numpy.min)
+    stats.register("max", numpy.max)
+
+
 test_maze = Maze()
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
@@ -172,10 +179,7 @@ update_fitnesses_to_population()
 
 
 stats = tools.Statistics(key=lambda ind: ind.fitness.values)
-stats.register("avg", numpy.mean)
-stats.register("std", numpy.std)
-stats.register("min", numpy.min)
-stats.register("max", numpy.max)
+register_stats()
 
 pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=1000, stats=stats, halloffame=Best_2_ind, verbose=True)
 print_graph(logbook)
