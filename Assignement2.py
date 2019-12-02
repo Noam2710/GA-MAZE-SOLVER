@@ -6,13 +6,14 @@ import matplotlib.pyplot as plt
 
 
 SIZE_OF_CHROMOSOME = 20
-POP_SIZE = 100
+POP_SIZE = 500
 GENES_OPTIONS = ['RIGHT', 'LEFT', 'UP', 'DOWN']
 WALL = '@'
 GENOME_MIN = 0
 GENOME_MAX = 3
 GENERATIONS_NUMBER = 150
 PRINT_FINAL_SOLUTION = False
+APPROACH = 2
 
 
 class Maze:
@@ -58,22 +59,25 @@ def get_length_to_reach_the_goal(individual):
         step = GENES_OPTIONS[step]
         if step == 'RIGHT':
             new_index = [maze.current_loc[0], maze.current_loc[1] + 1]
-            valid_step = check_if_valid_step(new_index, maze.maze)
         if step == 'LEFT':
             new_index = [maze.current_loc[0], maze.current_loc[1] - 1]
-            valid_step = check_if_valid_step(new_index, maze.maze)
         if step == 'UP':
             new_index = [maze.current_loc[0] - 1, maze.current_loc[1]]
-            valid_step = check_if_valid_step(new_index, maze.maze)
         if step == 'DOWN':
             new_index = [maze.current_loc[0] + 1, maze.current_loc[1]]
-            valid_step = check_if_valid_step(new_index, maze.maze)
 
+        valid_step = check_if_valid_step(new_index, maze.maze)
         if valid_step:
             maze.current_loc = new_index
 
         if maze.current_loc == maze.end_loc:
             break
+    if APPROACH == 2:
+        if idx + 1 == 9:
+            return 3,
+
+        if idx + 1 == 11:
+            return 15,
 
     return idx + 1,
 
@@ -163,6 +167,25 @@ def print_the_best_solution():
                 break
 
 
+def cxOnePoint(ind1, ind2):
+    """Executes a one point crossover on the input :term:`sequence` individuals.
+    The two individuals are modified in place. The resulting individuals will
+    respectively have the length of the other.
+
+    :param ind1: The first individual participating in the crossover.
+    :param ind2: The second individual participating in the crossover.
+    :returns: A tuple of two individuals.
+
+    This function uses the :func:`~random.randint` function from the
+    python base :mod:`random` module.
+    """
+    position = min(ind1.fitness.values[0], ind2.fitness.values[0])
+    cxpoint = random.randint(1, position - 1)
+    ind1[cxpoint:], ind2[cxpoint:] = ind2[cxpoint:], ind1[cxpoint:]
+
+    return ind1, ind2
+
+
 test_maze = Maze()
 print_initial_maze()
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -175,22 +198,26 @@ toolbox.register("individual", tools.initRepeat, creator.Individual,
 
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("evaluate", get_length_to_reach_the_goal)
-toolbox.register("mate", tools.cxOnePoint)
-toolbox.register("mutate", tools.mutUniformInt, low=GENOME_MIN, up=GENOME_MAX, indpb=0.5)
-toolbox.register("select", tools.selTournament, tournsize=10)
 
+if APPROACH == 2:
+    toolbox.register("mate", cxOnePoint)
+else:
+    toolbox.register("mate", tools.cxOnePoint)
+
+toolbox.register("mutate", tools.mutUniformInt, low=GENOME_MIN, up=GENOME_MAX, indpb=0.2)
+toolbox.register("select", tools.selTournament, tournsize=100)
 
 pop = toolbox.population(n=POP_SIZE)
 fitnesses = toolbox.map(toolbox.evaluate, pop)
 best_ind = tools.HallOfFame(1)
 update_fitnesses_to_population()
 
-
 stats = tools.Statistics(key=lambda ind: ind.fitness.values)
 register_stats()
 
-pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=GENERATIONS_NUMBER, stats=stats, halloffame=best_ind,
+pop, logbook = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.8, ngen=GENERATIONS_NUMBER, stats=stats, halloffame=best_ind,
                                    verbose=True)
+
 
 print_the_best_solution()
 print_graph(logbook)
