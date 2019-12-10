@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 
 
 SIZE_OF_CHROMOSOME = 20
-POP_SIZE = 500
+POP_SIZE = 100
 GENES_OPTIONS = ['RIGHT', 'LEFT', 'UP', 'DOWN']
 WALL = '@'
 GENOME_MIN = 0
 GENOME_MAX = 3
 GENERATIONS_NUMBER = 150
 PRINT_FINAL_SOLUTION = False
-APPROACH = 2
+APPROACH = 3
 
 
 class Maze:
@@ -55,6 +55,7 @@ class Maze:
 def get_length_to_reach_the_goal(individual):
     maze = test_maze
     maze.current_loc = maze.start_loc
+    num_of_not_valid_steps = 0
     for idx, step in enumerate(individual):
         step = GENES_OPTIONS[step]
         if step == 'RIGHT':
@@ -69,17 +70,15 @@ def get_length_to_reach_the_goal(individual):
         valid_step = check_if_valid_step(new_index, maze.maze)
         if valid_step:
             maze.current_loc = new_index
+        else:
+            num_of_not_valid_steps += 4
 
         if maze.current_loc == maze.end_loc:
             break
-    if APPROACH == 2:
-        if idx + 1 == 9:
-            return 3,
-
-        if idx + 1 == 11:
-            return 15,
-
-    return idx + 1,
+    if APPROACH == 3:
+        return num_of_not_valid_steps + idx + 1,
+    else:
+        return idx + 1,
 
 
 def check_if_valid_step(new_index, maze):
@@ -100,18 +99,24 @@ def print_graph(logbook):
     gen = logbook.select("gen")
     fit_mins = logbook.select("min")
     fit_avgs = logbook.select("avg")
+    fit_maxs = logbook.select('max')
+    fit_med = logbook.select('med')
 
     fig, ax1 = plt.subplots()
-    line1 = ax1.plot(gen, fit_mins, "b-", label="Minimum Fitness")
+
     ax1.set_xlabel("Generation")
     ax1.set_ylabel("Fitness", color="b")
 
     for tl in ax1.get_yticklabels():
         tl.set_color("b")
 
+    line1 = ax1.plot(gen, fit_mins, "b-", label="Minimum Fitness")
     line2 = ax1.plot(gen, fit_avgs, "r-", label="Average Fitness")
+    line3 = ax1.plot(gen, fit_maxs, "g-", label="Maximum Fitness")
+    line4 = ax1.plot(gen, fit_med, "y-", label="Median Fitness")
 
-    lns = line1 + line2
+
+    lns = line1 + line2 + line3 + line4
     labs = [l.get_label() for l in lns]
     ax1.legend(lns, labs, loc="center right")
 
@@ -128,6 +133,7 @@ def register_stats():
     stats.register("std", numpy.std)
     stats.register("min", numpy.min)
     stats.register("max", numpy.max)
+    stats.register("med", numpy.median)
 
 
 def print_initial_maze():
